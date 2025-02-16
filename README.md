@@ -1,7 +1,7 @@
 
 # Charity-Blockchain-Project-Aditya_Konda
 
-<img src="path/to/banner-image.jpg" alt="Project Banner" width="100%">
+<img src="Screenshots/Banner.jpg" alt="Project Banner" width="100%">
 
 ## Introduction
 The **Charity Blockchain Project** is a decentralized platform that ensures transparency and security in charitable donations using blockchain technology. The platform leverages smart contracts to facilitate secure transactions and prevent fraud, ensuring that funds reach the intended recipients.
