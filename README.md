@@ -1,3 +1,117 @@
+# Charity Blockchain Project
+
+<img src="path/to/banner-image.jpg" alt="Project Banner" width="100%">
+
+## Introduction
+The **Charity Blockchain Project** is a decentralized platform that ensures transparency and security in charitable donations using blockchain technology. The platform leverages smart contracts to facilitate secure transactions and prevent fraud, ensuring that funds reach the intended recipients.
+
+## Features
+- **Decentralized Donations**: Uses blockchain to securely transfer funds.
+- **Smart Contracts**: Automates and ensures transparency in donations.
+- **User Authentication**: Secure login with MetaMask.
+- **Transaction Tracking**: Donors can track their funds on the blockchain.
+- **Mining Blocks**: Transactions are verified and stored in blocks.
+- **Organization Management**: NGOs can register and receive funds.
+
+## Tech Stack
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Node.js, Express.js
+- **Blockchain**: Ethereum, Solidity, Web3.js
+- **Database**: MongoDB
+- **Authentication**: MetaMask
+
+## Installation Guide
+Follow these steps to set up and run the project on your local machine:
+
+### Prerequisites
+- Node.js and npm installed
+- MetaMask Extension in your browser
+- Ganache for local blockchain testing
+
+### Steps
+1. **Clone the Repository**
+   ```sh
+   git clone https://github.com/AdityaKonda6/Charity-Blockchain-Project-Aditya_Konda.git
+   cd Charity-Blockchain-Project-Aditya_Konda
+   ```
+2. **Install Dependencies**
+   ```sh
+   npm install
+   ```
+3. **Start the Blockchain (Ganache)**
+   - Open Ganache and create a new workspace.
+   - Configure it to use a local Ethereum network.
+
+4. **Deploy Smart Contracts**
+   ```sh
+   truffle migrate --reset
+   ```
+5. **Run the Project**
+   ```sh
+   npm start
+   ```
+6. **Open in Browser**
+   - Navigate to `http://localhost:3000`
+   - Connect MetaMask and start donating!
+
+## Project Workflow
+1. **User Registration & Login**
+   - Users register and log in using MetaMask.
+   - They can view registered charities and their details.
+   
+2. **Making Donations**
+   - Users send donations via the blockchain.
+   - Transactions are verified through smart contracts.
+   
+3. **Mining and Verification**
+   - Each donation is recorded as a block in the chain.
+   - Miners verify transactions to ensure authenticity.
+
+4. **Tracking Transactions**
+   - Donors can track their donations via transaction IDs.
+   - Transparency is maintained as all transactions are public.
+
+## Screenshots
+1. **Login Page**
+   <img src="path/to/login.jpg" alt="Login Page" width="800px">
+
+2. **MetaMask Authentication**
+   <img src="path/to/metamask.jpg" alt="MetaMask Authentication" width="800px">
+
+3. **Organization Registration**
+   <img src="path/to/organization.jpg" alt="Organization Registration" width="800px">
+
+4. **Donation Transaction**
+   <img src="path/to/donation.jpg" alt="Donation Transaction" width="800px">
+
+5. **Mining Process**
+   <img src="path/to/mine.jpg" alt="Mining Process" width="800px">
+
+## Contributing
+Contributions are welcome! Feel free to fork this repository and submit pull requests.
+
+## License
+This project is licensed under the MIT License.
+
+---
+Developed by **Aditya Konda**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Charity-Blockchain-Project-Aditya_Konda
 ## Hey there 👋, I'm [<a href="https://adityakonda04.vercel.app/">Aditya!</a>]([https://github.com/AdityaKonda6])
 
