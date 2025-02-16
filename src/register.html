@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Aditya | Blockchain Charity</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-family: 'Open Sans', sans-serif;
+      color: white;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-control {
+      border-radius: 25px;
+      padding: 10px;
+      border: none;
+      transition: 0.3s;
+    }
+
+    .form-control:focus {
+      box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
+      outline: none;
+    }
+
+    .btn-primary {
+      background: #ff6b6b;
+      border: none;
+      border-radius: 25px;
+      padding: 10px;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      background: #ff4757;
+      box-shadow: 0px 0px 15px rgba(255, 107, 107, 0.5);
+    }
+
+    .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+      animation: fadeInDown 1s;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <i class="fas fa-user-plus icon"></i>
+    <h4 class="mb-3">Register</h4>
+    <form onSubmit="register(); return false;">
+      <input id="charity_name" type="text" class="form-control mb-3" placeholder="Charity Name" required>
+      <input id="years_running" type="number" class="form-control mb-3" placeholder="Years Running" required>
+      <input id="formed_date" type="date" class="form-control mb-3" placeholder="Formed Date" required>
+      <input id="email" type="email" class="form-control mb-3" placeholder="Email" required>
+      <input id="password" type="password" class="form-control mb-3" placeholder="Password" required>
+      <input id="confirm_password" type="password" class="form-control mb-3" placeholder="Confirm Password" required>
+      <button type="submit" class="btn btn-primary btn-block">Register</button>
+    </form>
+    <p class="mt-3">Already have an account? <a href="login.html" class="text-light font-weight-bold">Login</a></p>
+  </div>
+
+  <script>
+    function register() {
+      const charityName = document.getElementById('charity_name').value;
+      const yearsRunning = document.getElementById('years_running').value;
+      const formedDate = document.getElementById('formed_date').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match. Please check and try again.');
+        return;
+      }
+
+      localStorage.setItem('charityName', charityName);
+      localStorage.setItem('yearsRunning', yearsRunning);
+      localStorage.setItem('formedDate', formedDate);
+      localStorage.setItem('registeredEmail', email);
+      localStorage.setItem('registeredPassword', password);
+      alert('Registration successful! Please login.');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+
+</html>

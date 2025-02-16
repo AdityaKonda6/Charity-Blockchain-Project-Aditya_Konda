@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aditya Charity Blockchain</title>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/truffle-contract/4.0.31/truffle-contract.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    
+    <style>
+      body {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        font-family: 'Open Sans', sans-serif;
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .navbar {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+      }
+      .container {
+        padding-top: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+        margin-bottom: 20px;
+      }
+      .form-control {
+        border-radius: 25px;
+        padding: 10px;
+        border: none;
+        transition: 0.3s;
+      }
+      .form-control:focus {
+        box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
+        outline: none;
+      }
+      .btn-primary, .btn-success {
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        font-weight: bold;
+      }
+      .btn-primary:hover, .btn-success:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 0px 15px rgba(255, 107, 107, 0.5);
+      }
+      .icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+        animation: fadeInDown 1s;
+      }
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .marquee {
+        font-weight: bold;
+        color: #444;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .modal-content {
+        background-color: #fff;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      // Check if the user is logged in
+      if (!localStorage.getItem('loggedIn')) {
+        window.location.href = 'login.html';
+      }
+
+      function logout() {
+        localStorage.removeItem('loggedIn');
+        localStorage.removeItem('charityName');
+        window.location.href = 'login.html';
+      }
+    </script>
+
+    <nav class="navbar navbar-dark fixed-top shadow p-3">
+      <a class="navbar-brand" href="http://adityakonda04.vercel.app/" target="_blank">Aditya | Charity Blockchain</a>
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <small class="nav-link">Welcome, <span id="charityName"></span></small>
+        </li>
+        <li class="nav-item text-nowrap">
+          <button class="btn btn-danger" onClick="logout()">Logout</button>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="container">
+      <div class="marquee">Please register in MetaMask before using this APP</div>
+      
+      <div class="card">
+        <i class="fas fa-hand-holding-heart icon"></i>
+        <h4 class="mb-3">Enter Charity Details</h4>
+        <form onSubmit="App.createCharity(); showSuccessModal('Charity'); return false;">
+          <input id="charity_name" type="text" class="form-control mb-2" placeholder="Charity Name" required>
+          <input id="charity_desciption" type="text" class="form-control mb-2" placeholder="Charity Description" required>
+          <input id="charity_Account" type="text" class="form-control mb-2" placeholder="Bank Account" required>
+          <input id="charity_bankName" type="text" class="form-control mb-2" placeholder="Bank Name" required>
+          <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+      </div>
+	  
+	  <div class="card">
+        <i class="fas fa-building icon"></i>
+        <h4 class="mb-3">Enter Organisation Details</h4>
+        <form onSubmit="App.createOrganisation(); showSuccessModal('Organisation'); return false;">
+          <input id="organisation_name" type="text" class="form-control mb-2" placeholder="Organisation Name" required>
+          <input id="organisation_account" type="text" class="form-control mb-2" placeholder="Organisation Bank Account" required>
+          <input id="organisation_bankname" type="text" class="form-control mb-2" placeholder="Organisation Bank Name" required>
+          <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+      </div>
+      
+      <div class="card">
+        <i class="fas fa-exchange-alt icon"></i>
+        <h4 class="mb-3">Enter Transaction Details</h4>
+        <form onSubmit="App.createTransaction(); showSuccessModal('Transaction'); return false;">
+          <input id="add_of_charity" type="text" class="form-control mb-2" placeholder="Charity Address" required>
+          <input id="add_of_org" type="text" class="form-control mb-2" placeholder="Organisation Address" required>
+          <input id="amount" type="text" class="form-control mb-2" placeholder="Amount" required>
+          <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+      </div>
+
+
+      
+      <div class="card text-center">
+        <i class="fas fa-cube icon"></i>
+        <h4 class="mb-3">Blockchain Details</h4>
+        <button type="button" class="btn btn-success" onClick="mineBlock();">Mine Block</button>
+        <br><br>
+        <div class="blockchain">
+          <label>
+            <span class="content25">Organisation Address: </span><br>
+            <span class="content26">Charity Address: </span><br>
+            <span class="content27">Amount: </span><br>
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Success</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body" id="successModalBody">Operation completed successfully!</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="downloadCertificate" style="display: none;">Download Certificate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      let charitySubmitted = false;
+      let transactionSubmitted = false;
+      let organisationSubmitted = false;
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const charityName = localStorage.getItem('charityName');
+        document.getElementById('charityName').textContent = charityName;
+      });
+
+      function showSuccessModal(action) {
+        let message = '';
+        if (action === 'Charity') {
+          const name = $('#charity_name').val();
+          const description = $('#charity_desciption').val();
+          const account = $('#charity_Account').val();
+          const bankName = $('#charity_bankName').val();
+          message = `Charity Created Successfully!<br>Name: ${name}<br>Description: ${description}<br>Account: ${account}<br>Bank Name: ${bankName}`;
+          charitySubmitted = true;
+        } else if (action === 'Transaction') {
+          const charityAddress = $('#add_of_charity').val();
+          const orgAddress = $('#add_of_org').val();
+          const amount = $('#amount').val();
+          message = `Transaction Created Successfully!<br>Charity Address: ${charityAddress}<br>Organisation Address: ${orgAddress}<br>Amount: ${amount}`;
+          transactionSubmitted = true;
+        } else if (action === 'Organisation') {
+          const name = $('#organisation_name').val();
+          const account = $('#organisation_account').val();
+          const bankName = $('#organisation_bankname').val();
+          message = `Organisation Created Successfully!<br>Name: ${name}<br>Account: ${account}<br>Bank Name: ${bankName}`;
+          organisationSubmitted = true;
+        } else if (action === 'Mine Block') {
+          if (charitySubmitted && transactionSubmitted && organisationSubmitted) {
+            message = 'Block Mined Successfully!';
+            charitySubmitted = false;
+            transactionSubmitted = false;
+            organisationSubmitted = false;
+
+            // Display blockchain details
+            const charityAddress = $('#add_of_charity').val();
+            const orgAddress = $('#add_of_org').val();
+            const amount = $('#amount').val();
+
+            document.querySelector('.content25').textContent = `Organisation Address: ${orgAddress}`;
+            document.querySelector('.content26').textContent = `Charity Address: ${charityAddress}`;
+            document.querySelector('.content27').textContent = `Amount: ${amount}`;
+
+            // Show download certificate button
+            document.getElementById('downloadCertificate').style.display = 'block';
+
+            // Generate certificate
+            generateCertificate(orgAddress, charityAddress, amount);
+          } else {
+            message = 'Please complete Charity, Transaction, and Organisation forms before mining a block.';
+          }
+        }
+        $('#successModalBody').html(message);
+        $('#successModal').modal('show');
+      }
+
+      function mineBlock() {
+        App.blockchain_function();
+        showSuccessModal('Mine Block');
+      }
+
+      function generateCertificate(orgAddress, charityAddress, amount) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const charityName = $('#charity_name').val();
+        const charityDescription = $('#charity_desciption').val();
+        const charityAccount = $('#charity_Account').val();
+        const charityBankName = $('#charity_bankName').val();
+
+        const organisationName = $('#organisation_name').val();
+        const organisationAccount = $('#organisation_account').val();
+        const organisationBankName = $('#organisation_bankname').val();
+
+        const date = new Date();
+        const dateString = date.toLocaleString();
+
+        // Add border
+        doc.setLineWidth(1);
+        doc.rect(10, 10, 190, 277);
+
+        // Add logo
+        const logoUrl = 'https://i.ibb.co/qFLTZSLy/aditya.png'; // Replace with your logo URL
+        const img = new Image();
+        img.src = logoUrl;
+        img.onload = function () {
+          doc.addImage(img, 'PNG', 15, 15, 30, 30);
+
+          // Add title
+          doc.setFontSize(20);
+          doc.setTextColor(0, 0, 128);
+          doc.text('Blockchain Charity Certificate', 60, 30);
+
+          // Add details
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`Date: ${dateString}`, 20, 50);
+          doc.text(`Charity Details:`, 20, 60);
+          doc.text(`Name: ${charityName}`, 20, 70);
+          doc.text(`Description: ${charityDescription}`, 20, 80);
+          doc.text(`Account: ${charityAccount}`, 20, 90);
+          doc.text(`Bank Name: ${charityBankName}`, 20, 100);
+          doc.text(`Organisation Details:`, 20, 110);
+          doc.text(`Name: ${organisationName}`, 20, 120);
+          doc.text(`Account: ${organisationAccount}`, 20, 130);
+          doc.text(`Bank Name: ${organisationBankName}`, 20, 140);
+          doc.text(`Transaction Details:`, 20, 150);
+          doc.text(`Organisation Address: ${orgAddress}`, 20, 160);
+          doc.text(`Charity Address: ${charityAddress}`, 20, 170);
+          doc.text(`Amount: ${amount}`, 20, 180);
+
+          document.getElementById('downloadCertificate').addEventListener('click', function () {
+            doc.save('certificate.pdf');
+          });
+        };
+      }
+    </script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="new_app.js"></script>
+  </body>
+</html>
