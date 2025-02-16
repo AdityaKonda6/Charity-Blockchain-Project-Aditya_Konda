@@ -1,4 +1,5 @@
-# Charity Blockchain Project
+
+# Charity-Blockchain-Project-Aditya_Konda
 
 <img src="path/to/banner-image.jpg" alt="Project Banner" width="100%">
 
@@ -73,19 +74,53 @@ Follow these steps to set up and run the project on your local machine:
 
 ## Screenshots
 1. **Login Page**
-   <img src="path/to/login.jpg" alt="Login Page" width="800px">
+<img src="Screenshots/login.jpg" alt="Login Page" width="800px">
 
-2. **MetaMask Authentication**
-   <img src="path/to/metamask.jpg" alt="MetaMask Authentication" width="800px">
+2. **Register Page**
+ <img src="Screenshots/Register.jpg" alt="Login Page" width="800px">
 
-3. **Organization Registration**
-   <img src="path/to/organization.jpg" alt="Organization Registration" width="800px">
+3. **Welcome**
+ <img src="Screenshots/welcome.jpg" alt="Login Page" width="800px">
 
-4. **Donation Transaction**
-   <img src="path/to/donation.jpg" alt="Donation Transaction" width="800px">
+4. **Charity Details**
+ <img src="Screenshots/Charity details.jpg" alt="Login Page" width="800px">
 
-5. **Mining Process**
-   <img src="path/to/mine.jpg" alt="Mining Process" width="800px">
+5. **Organization**
+ <img src="Screenshots/Organization.jpg" alt="Login Page" width="800px">
+
+6. **Organization Details**
+ <img src="Screenshots/Organization details.jpg" alt="Login Page" width="800px">
+
+7. **MetaMask Authentication**
+ <img src="Screenshots/Metamask login.jpg" alt="Login Page" width="800px">
+
+8. **MetaMask**
+ <img src="Screenshots/metamask.jpg" alt="Login Page" width="800px">
+
+9. **Copy Address For Sender**
+ <img src="Screenshots/Copy address for sender transaction.jpg" alt="Login Page" width="800px">
+
+10. **Copy Address Of Receiver For Transaction**
+ <img src="Screenshots/Copy address for receiver transaction.jpg" alt="Login Page" width="800px">
+
+11. **Transfer Request**
+ <img src="Screenshots/Transfer request.jpg" alt="Login Page" width="800px">
+
+12. **Transfer Confirmed**
+ <img src="Screenshots/Transfer confirmed.jpg" alt="Login Page" width="800px">
+
+13. **Mine A Block**
+ <img src="Screenshots/Mine Block.jpg" alt="Login Page" width="800px">
+
+14. **Mine A Block Successful**
+ <img src="Screenshots/Mine Block successfull.jpg" alt="Login Page" width="800px">
+
+15. **Download Certificate**
+ <img src="Screenshots/Download Certificate.jpg" alt="Login Page" width="800px">
+
+16. **Certificate Proof**
+ <img src="Screenshots/Certificate proof.jpg" alt="Login Page" width="800px"> 
+
 
 ## Contributing
 Contributions are welcome! Feel free to fork this repository and submit pull requests.
@@ -96,23 +131,6 @@ This project is licensed under the MIT License.
 ---
 Developed by **Aditya Konda**
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Charity-Blockchain-Project-Aditya_Konda
 ## Hey there 👋, I'm [<a href="https://adityakonda04.vercel.app/">Aditya!</a>]([https://github.com/AdityaKonda6])
 
 [![Twitter Badge](https://img.shields.io/badge/-Twitter-00acee?style=flat-square&logo=Twitter&logoColor=white)](https://twitter.com/AdityaKonda7)
