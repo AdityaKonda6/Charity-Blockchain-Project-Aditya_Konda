@@ -1,4 +1,3 @@
-
 # Charity-Blockchain-Project-Aditya_Konda
 
 <img src="Screenshots/Banner.jpg" alt="Project Banner" width="100%">
