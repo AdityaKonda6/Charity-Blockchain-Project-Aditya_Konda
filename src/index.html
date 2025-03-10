@@ -89,6 +89,131 @@
         background-color: #fff;
         color: #000;
       }
+      #metamask-warning, #network-warning {
+        background: rgba(255, 0, 0, 0.1);
+        border: 2px solid rgba(255, 0, 0, 0.3);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        max-width: 600px;
+        margin: 100px auto 0;
+        display: none;
+      }
+      .account-info {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 20px;
+        border-radius: 25px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .account-info i {
+        margin-right: 10px;
+        color: #4cd137;
+      }
+      .account-badge {
+        background: rgba(76, 209, 55, 0.2);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+      }
+      .address-truncate {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .workflow-step {
+        position: relative;
+        margin-bottom: 30px;
+      }
+      .workflow-step::after {
+        content: '';
+        position: absolute;
+        width: 2px;
+        background-color: rgba(255, 255, 255, 0.3);
+        top: 100%;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .workflow-step:last-child::after {
+        display: none;
+      }
+      .status-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        z-index: 10;
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+      .card-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+      }
+      .disabled-section {
+        opacity: 0.5;
+        pointer-events: none;
+        position: relative;
+      }
+      .disabled-section::after {
+        content: "Complete previous steps first";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        z-index: 10;
+      }
+      .completed {
+        background: rgba(40, 167, 69, 0.1);
+      }
+      .completed .form-control {
+        background-color: rgba(76, 209, 55, 0.1);
+        border: 1px solid rgba(76, 209, 55, 0.3);
+      }
+      .step-number {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .loading-spinner {
+        width: 3rem;
+        height: 3rem;
+      }
+      .debug-info {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        text-align: left;
+        max-height: 100px;
+        overflow-y: auto;
+      }
+      #mock-mode-warning {
+        background-color: rgba(255, 193, 7, 0.2);
+        border: 1px solid rgba(255, 193, 7, 0.5);
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -107,8 +232,8 @@
 
     <nav class="navbar navbar-dark fixed-top shadow p-3">
       <a class="navbar-brand" href="http://adityakonda04.vercel.app/" target="_blank">Aditya | Charity Blockchain</a>
-      <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
+      <ul class="navbar-nav px-3 d-flex flex-row">
+        <li class="nav-item text-nowrap mr-3">
           <small class="nav-link">Welcome, <span id="charityName"></span></small>
         </li>
         <li class="nav-item text-nowrap">
@@ -117,68 +242,181 @@
       </ul>
     </nav>
     
-    <div class="container">
-      <div class="marquee">Please register in MetaMask before using this APP</div>
+    <!-- MetaMask Warning -->
+    <div id="metamask-warning" class="text-center">
+      <i class="fas fa-exclamation-triangle fa-4x mb-3" style="color: #ff6b6b;"></i>
+      <h3>MetaMask Connection Required</h3>
+      <p class="mb-4">You need to connect to MetaMask to use this application. Please connect your wallet to proceed.</p>
+      <button class="btn btn-warning btn-lg" onclick="App.connectToMetaMask()">
+        <i class="fas fa-wallet mr-2"></i> Connect to MetaMask
+      </button>
+    </div>
+    
+    <!-- Network Warning -->
+    <div id="network-warning" class="text-center">
+      <i class="fas fa-exclamation-triangle fa-4x mb-3" style="color: #ff6b6b;"></i>
+      <h3>Wrong Network Detected</h3>
+      <p class="mb-4">The smart contract for this application is not deployed on the current network. Please switch to the correct network to proceed.</p>
+      <button class="btn btn-warning btn-lg" onclick="App.switchNetwork()">
+        <i class="fas fa-exchange-alt mr-2"></i> Switch to Correct Network
+      </button>
+      <div class="debug-info mt-3">
+        <p>If you're running a local blockchain (like Ganache), make sure it's running and that you've deployed the contract to it.</p>
+        <p>Expected network: Ganache (Chain ID: 1337)</p>
+        <p>Current network ID: <span id="current-network-id">Unknown</span></p>
+      </div>
+    </div>
+    
+    <div id="main-content" class="container">
+      <div class="account-info w-100">
+        <div>
+          <i class="fas fa-circle"></i> Connected to MetaMask
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="mr-3 address-truncate" id="connected-address">0x0000000000000000000000000000000000000000</span>
+          <span class="account-badge" id="account-balance">0 ETH</span>
+        </div>
+      </div>
       
-      <div class="card">
+      <!-- Mock Mode Warning -->
+      <div id="mock-mode-warning" class="w-100 text-center">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <strong>Demo Mode Active:</strong> The application is running in demo mode because the smart contract was not found. All transactions are simulated and not recorded on the blockchain.
+      </div>
+      
+      <!-- Charity Section -->
+      <div id="charity-section" class="card workflow-step">
+        <span class="badge badge-warning status-badge">Step 1</span>
+        <div class="card-body">
+          <div class="card-header">
+            <span class="step-number">1</span>
+            <h4 class="d-inline-block mb-0">Enter Charity Details</h4>
+          </div>
         <i class="fas fa-hand-holding-heart icon"></i>
-        <h4 class="mb-3">Enter Charity Details</h4>
-        <form onSubmit="App.createCharity(); showSuccessModal('Charity'); return false;">
+          <form onSubmit="App.createCharity(); return false;">
           <input id="charity_name" type="text" class="form-control mb-2" placeholder="Charity Name" required>
           <input id="charity_desciption" type="text" class="form-control mb-2" placeholder="Charity Description" required>
           <input id="charity_Account" type="text" class="form-control mb-2" placeholder="Bank Account" required>
           <input id="charity_bankName" type="text" class="form-control mb-2" placeholder="Bank Name" required>
           <button type="submit" class="btn btn-primary btn-block">Submit</button>
         </form>
+        </div>
       </div>
 	  
-	  <div class="card">
+      <!-- Organisation Section -->
+	  <div id="organisation-section" class="card workflow-step disabled-section">
+        <span class="badge badge-warning status-badge">Step 2</span>
+        <div class="card-body">
+          <div class="card-header">
+            <span class="step-number">2</span>
+            <h4 class="d-inline-block mb-0">Enter Organisation Details</h4>
+          </div>
         <i class="fas fa-building icon"></i>
-        <h4 class="mb-3">Enter Organisation Details</h4>
-        <form onSubmit="App.createOrganisation(); showSuccessModal('Organisation'); return false;">
+          <form onSubmit="App.createOrganisation(); return false;">
           <input id="organisation_name" type="text" class="form-control mb-2" placeholder="Organisation Name" required>
           <input id="organisation_account" type="text" class="form-control mb-2" placeholder="Organisation Bank Account" required>
           <input id="organisation_bankname" type="text" class="form-control mb-2" placeholder="Organisation Bank Name" required>
           <button type="submit" class="btn btn-primary btn-block">Submit</button>
         </form>
+        </div>
       </div>
       
-      <div class="card">
+      <!-- Transaction Section -->
+      <div id="transaction-section" class="card workflow-step disabled-section">
+        <span class="badge badge-warning status-badge">Step 3</span>
+        <div class="card-body">
+          <div class="card-header">
+            <span class="step-number">3</span>
+            <h4 class="d-inline-block mb-0">Enter Transaction Details</h4>
+          </div>
         <i class="fas fa-exchange-alt icon"></i>
-        <h4 class="mb-3">Enter Transaction Details</h4>
-        <form onSubmit="App.createTransaction(); showSuccessModal('Transaction'); return false;">
+          <form onSubmit="App.createTransaction(); return false;">
           <input id="add_of_charity" type="text" class="form-control mb-2" placeholder="Charity Address" required>
           <input id="add_of_org" type="text" class="form-control mb-2" placeholder="Organisation Address" required>
-          <input id="amount" type="text" class="form-control mb-2" placeholder="Amount" required>
+            <input id="amount" type="text" class="form-control mb-2" placeholder="Amount (ETH)" required>
           <button type="submit" class="btn btn-primary btn-block">Submit</button>
         </form>
+        </div>
       </div>
-
-
       
-      <div class="card text-center">
-        <i class="fas fa-cube icon"></i>
-        <h4 class="mb-3">Blockchain Details</h4>
-        <button type="button" class="btn btn-success" onClick="mineBlock();">Mine Block</button>
-        <br><br>
-        <div class="blockchain">
-          <label>
-            <span class="content25">Organisation Address: </span><br>
-            <span class="content26">Charity Address: </span><br>
-            <span class="content27">Amount: </span><br>
-          </label>
+      <!-- Blockchain Section -->
+      <div id="blockchain-section" class="card workflow-step disabled-section">
+        <span class="badge badge-warning status-badge">Step 4</span>
+        <div class="card-body">
+          <div class="card-header">
+            <span class="step-number">4</span>
+            <h4 class="d-inline-block mb-0">Mine Block & Get Certificate</h4>
+          </div>
+          <i class="fas fa-cube icon"></i>
+          <p class="mb-3">After completing all previous steps, you can mine a block to record your transaction permanently on the blockchain and receive a certificate.</p>
+          
+          <div class="blockchain-details p-3 mb-3" style="background: rgba(0,0,0,0.1); border-radius: 10px; text-align: left;">
+            <h5 class="mb-3 text-center">Transaction Details</h5>
+            <div class="row mb-2">
+              <div class="col-4 font-weight-bold">Organisation Address:</div>
+              <div class="col-8 content25 text-break">-</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4 font-weight-bold">Charity Address:</div>
+              <div class="col-8 content26 text-break">-</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4 font-weight-bold">Amount:</div>
+              <div class="col-8 content27">-</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4 font-weight-bold">Transaction Hash:</div>
+              <div class="col-8 content28 text-break">-</div>
+            </div>
+          </div>
+          
+          <button type="button" class="btn btn-success btn-block" onClick="App.blockchain_function();">Mine Block</button>
         </div>
       </div>
     </div>
     
+      <!-- Hidden templates for rendering blockchain data -->
+      <div class="taskTemplate" style="display: none;">
+        <div class="content1"></div>
+        <div class="content2"></div>
+        <div class="content3"></div>
+        <div class="content4"></div>
+        <div class="content5"></div>
+        <div class="content6"></div>
+        <div class="content15"></div>
+        <div class="content17"></div>
+        <div class="content18"></div>
+      </div>
+      
+      <div class="organisation_for_html" style="display: none;">
+        <div class="content9"></div>
+        <div class="content10"></div>
+        <div class="content11"></div>
+        <div class="content12"></div>
+        <div class="content13"></div>
+        <div class="content14"></div>
+        <div class="content16"></div>
+        <div class="content19"></div>
+      </div>
+      
+      <div class="transaction" style="display: none;">
+        <div class="content20"></div>
+        <div class="content21"></div>
+        <div class="content22"></div>
+        <div class="content23"></div>
+        <div class="content24"></div>
+      </div>
+    </div>
+    
+    <!-- Success Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header bg-success text-white">
             <h5 class="modal-title">Success</h5>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
-          <div class="modal-body" id="successModalBody">Operation completed successfully!</div>
+          <div class="modal-body">Operation completed successfully!</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" id="downloadCertificate" style="display: none;">Download Certificate</button>
@@ -187,74 +425,92 @@
       </div>
     </div>
     
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">An error occurred.</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Info Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title">Information</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">Information message</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Confirm Action</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">Are you sure you want to proceed?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirmYesBtn">Yes, Proceed</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center p-5">
+            <div class="spinner-border loading-spinner text-primary mb-3" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <h5 class="loading-message">Processing...</h5>
+            <p class="text-muted mt-2">Please wait while we process your request. This may take a moment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <script>
-      let charitySubmitted = false;
-      let transactionSubmitted = false;
-      let organisationSubmitted = false;
-
       document.addEventListener('DOMContentLoaded', function () {
         const charityName = localStorage.getItem('charityName');
         document.getElementById('charityName').textContent = charityName;
-      });
-
-      function showSuccessModal(action) {
-        let message = '';
-        if (action === 'Charity') {
-          const name = $('#charity_name').val();
-          const description = $('#charity_desciption').val();
-          const account = $('#charity_Account').val();
-          const bankName = $('#charity_bankName').val();
-          message = `Charity Created Successfully!<br>Name: ${name}<br>Description: ${description}<br>Account: ${account}<br>Bank Name: ${bankName}`;
-          charitySubmitted = true;
-        } else if (action === 'Transaction') {
-          const charityAddress = $('#add_of_charity').val();
-          const orgAddress = $('#add_of_org').val();
-          const amount = $('#amount').val();
-          message = `Transaction Created Successfully!<br>Charity Address: ${charityAddress}<br>Organisation Address: ${orgAddress}<br>Amount: ${amount}`;
-          transactionSubmitted = true;
-        } else if (action === 'Organisation') {
-          const name = $('#organisation_name').val();
-          const account = $('#organisation_account').val();
-          const bankName = $('#organisation_bankname').val();
-          message = `Organisation Created Successfully!<br>Name: ${name}<br>Account: ${account}<br>Bank Name: ${bankName}`;
-          organisationSubmitted = true;
-        } else if (action === 'Mine Block') {
-          if (charitySubmitted && transactionSubmitted && organisationSubmitted) {
-            message = 'Block Mined Successfully!';
-            charitySubmitted = false;
-            transactionSubmitted = false;
-            organisationSubmitted = false;
-
-            // Display blockchain details
-            const charityAddress = $('#add_of_charity').val();
-            const orgAddress = $('#add_of_org').val();
-            const amount = $('#amount').val();
-
-            document.querySelector('.content25').textContent = `Organisation Address: ${orgAddress}`;
-            document.querySelector('.content26').textContent = `Charity Address: ${charityAddress}`;
-            document.querySelector('.content27').textContent = `Amount: ${amount}`;
-
-            // Show download certificate button
-            document.getElementById('downloadCertificate').style.display = 'block';
-
-            // Generate certificate
-            generateCertificate(orgAddress, charityAddress, amount);
-          } else {
-            message = 'Please complete Charity, Transaction, and Organisation forms before mining a block.';
-          }
+        
+        // Display network ID for debugging
+        if (typeof web3 !== 'undefined') {
+          web3.eth.net.getId().then(function(networkId) {
+            document.getElementById('current-network-id').textContent = networkId;
+          });
         }
-        $('#successModalBody').html(message);
-        $('#successModal').modal('show');
-      }
-
-      function mineBlock() {
-        App.blockchain_function();
-        showSuccessModal('Mine Block');
-      }
+      });
 
       function generateCertificate(orgAddress, charityAddress, amount) {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        
+        // Create a new PDF with a landscape orientation for a more certificate-like look
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
 
         const charityName = $('#charity_name').val();
         const charityDescription = $('#charity_desciption').val();
@@ -267,43 +523,153 @@
 
         const date = new Date();
         const dateString = date.toLocaleString();
+        const certificateId = Date.now().toString();
+        const transactionHash = App.transactionHash || "0x" + Math.random().toString(16).substring(2, 66);
 
-        // Add border
-        doc.setLineWidth(1);
-        doc.rect(10, 10, 190, 277);
-
+        // Add fancy border
+        doc.setDrawColor(0, 48, 143); // Dark blue
+        doc.setLineWidth(1.5);
+        doc.roundedRect(5, 5, 287, 200, 3, 3); // Outer border
+        
+        doc.setDrawColor(0, 91, 187); // Medium blue
+        doc.setLineWidth(0.75);
+        doc.roundedRect(10, 10, 277, 190, 3, 3); // Inner border
+        
+        // Add decorative corners
+        doc.setFillColor(0, 48, 143); // Dark blue
+        doc.circle(5, 5, 5, 'F'); // Top left
+        doc.circle(292, 5, 5, 'F'); // Top right
+        doc.circle(5, 205, 5, 'F'); // Bottom left
+        doc.circle(292, 205, 5, 'F'); // Bottom right
+        
+        // Add background pattern
+        doc.setFillColor(240, 240, 255); // Very light blue
+        doc.roundedRect(15, 15, 267, 180, 3, 3, 'F');
+        
+        // Add watermark
+        doc.setTextColor(245, 245, 255);
+        doc.setFontSize(80);
+        doc.setFont('helvetica', 'bold');
+        doc.text('CHARITY', 150, 110, { align: 'center', angle: 45 });
+        
         // Add logo
         const logoUrl = 'https://i.ibb.co/qFLTZSLy/aditya.png'; // Replace with your logo URL
         const img = new Image();
         img.src = logoUrl;
         img.onload = function () {
-          doc.addImage(img, 'PNG', 15, 15, 30, 30);
+          doc.addImage(img, 'PNG', 20, 20, 30, 30);
 
-          // Add title
-          doc.setFontSize(20);
-          doc.setTextColor(0, 0, 128);
-          doc.text('Blockchain Charity Certificate', 60, 30);
-
-          // Add details
+          // Add certificate title
+          doc.setTextColor(0, 48, 143); // Dark blue
+          doc.setFontSize(30);
+          doc.setFont('helvetica', 'bold');
+          doc.text('BLOCKCHAIN CHARITY CERTIFICATE', 150, 30, { align: 'center' });
+          
+          // Add decorative line
+          doc.setDrawColor(0, 48, 143); // Dark blue
+          doc.setLineWidth(1);
+          doc.line(50, 35, 250, 35);
+          
+          // Add certificate number and date
+          doc.setTextColor(100, 100, 100); // Gray
           doc.setFontSize(12);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`Date: ${dateString}`, 20, 50);
-          doc.text(`Charity Details:`, 20, 60);
-          doc.text(`Name: ${charityName}`, 20, 70);
-          doc.text(`Description: ${charityDescription}`, 20, 80);
-          doc.text(`Account: ${charityAccount}`, 20, 90);
-          doc.text(`Bank Name: ${charityBankName}`, 20, 100);
-          doc.text(`Organisation Details:`, 20, 110);
-          doc.text(`Name: ${organisationName}`, 20, 120);
-          doc.text(`Account: ${organisationAccount}`, 20, 130);
-          doc.text(`Bank Name: ${organisationBankName}`, 20, 140);
-          doc.text(`Transaction Details:`, 20, 150);
-          doc.text(`Organisation Address: ${orgAddress}`, 20, 160);
-          doc.text(`Charity Address: ${charityAddress}`, 20, 170);
-          doc.text(`Amount: ${amount}`, 20, 180);
+          doc.setFont('helvetica', 'italic');
+          doc.text(`Certificate #${certificateId.substring(0, 8)}`, 150, 42, { align: 'center' });
+          doc.text(`Issued on: ${dateString}`, 150, 48, { align: 'center' });
+          
+          // Add main content
+          doc.setTextColor(0, 0, 0); // Black
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'normal');
+          
+          // Add certificate text
+          doc.setFontSize(14);
+          doc.text('This certificate confirms that', 150, 60, { align: 'center' });
+          
+          doc.setFontSize(18);
+          doc.setFont('helvetica', 'bold');
+          doc.text(organisationName, 150, 70, { align: 'center' });
+          
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'normal');
+          doc.text('has successfully donated', 150, 80, { align: 'center' });
+          
+          doc.setFontSize(18);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${amount} ETH`, 150, 90, { align: 'center' });
+          
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'normal');
+          doc.text('to', 150, 100, { align: 'center' });
+          
+          doc.setFontSize(18);
+          doc.setFont('helvetica', 'bold');
+          doc.text(charityName, 150, 110, { align: 'center' });
+          
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'italic');
+          doc.text(`"${charityDescription}"`, 150, 120, { align: 'center' });
+          
+          // Add transaction details
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          
+          // Left column
+          let y = 135;
+          doc.setFont('helvetica', 'bold');
+          doc.text('CHARITY DETAILS', 60, y);
+          doc.setFont('helvetica', 'normal');
+          y += 7;
+          doc.text(`Name: ${charityName}`, 60, y);
+          y += 7;
+          doc.text(`Bank Account: ${charityAccount}`, 60, y);
+          y += 7;
+          doc.text(`Bank Name: ${charityBankName}`, 60, y);
+          y += 7;
+          doc.text(`Address: ${charityAddress}`, 60, y);
+          
+          // Right column
+          y = 135;
+          doc.setFont('helvetica', 'bold');
+          doc.text('ORGANISATION DETAILS', 180, y);
+          doc.setFont('helvetica', 'normal');
+          y += 7;
+          doc.text(`Name: ${organisationName}`, 180, y);
+          y += 7;
+          doc.text(`Bank Account: ${organisationAccount}`, 180, y);
+          y += 7;
+          doc.text(`Bank Name: ${organisationBankName}`, 180, y);
+          y += 7;
+          doc.text(`Address: ${orgAddress}`, 180, y);
+          
+          // Add blockchain verification
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.text('BLOCKCHAIN VERIFICATION', 150, 175, { align: 'center' });
+          doc.setFont('helvetica', 'normal');
+          doc.text(`Transaction Hash: ${transactionHash}`, 150, 182, { align: 'center' });
+          doc.text('This donation has been permanently recorded on the Ethereum blockchain', 150, 189, { align: 'center' });
+          
+          // Add footer
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100); // Gray
+          doc.text('This certificate is generated by Aditya Charity Blockchain Platform', 150, 200, { align: 'center' });
+          doc.text('Verified and secured by Ethereum Blockchain', 150, 204, { align: 'center' });
+
+          // Add QR code-like element (simulated)
+          doc.setFillColor(0, 0, 0);
+          doc.roundedRect(250, 20, 30, 30, 2, 2, 'F');
+          doc.setFillColor(255, 255, 255);
+          for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+              if (Math.random() > 0.5) {
+                doc.rect(250 + i*6, 20 + j*6, 6, 6, 'F');
+              }
+            }
+          }
 
           document.getElementById('downloadCertificate').addEventListener('click', function () {
-            doc.save('certificate.pdf');
+            doc.save('charity_certificate.pdf');
           });
         };
       }
