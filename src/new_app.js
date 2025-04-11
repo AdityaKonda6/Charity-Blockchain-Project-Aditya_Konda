@@ -776,139 +776,149 @@ App = {
     }
   },
 
-  createTransaction: async () => {
-    if (!App.isMetaMaskConnected) {
-      App.showError("Please connect to MetaMask first.")
+
+
+
+  // ... existing code ...
+
+createTransaction: async () => {
+  if (!App.isMetaMaskConnected) {
+    App.showError("Please connect to MetaMask first.")
+    return
+  }
+  
+  if (!App.charityCreated || !App.organizationCreated) {
+    App.showError("Please complete charity and organisation registration first.")
+    return
+  }
+  
+  try {
+    var address_of_charity = $('#add_of_charity').val()
+    var address_of_organisation = $('#add_of_org').val()
+    var amountToSend = $('#amount').val()
+    
+    if (!address_of_charity || !address_of_organisation || !amountToSend) {
+      App.showError("Please fill in all transaction details.")
       return
     }
     
-    if (!App.charityCreated || !App.organizationCreated) {
-      App.showError("Please complete charity and organisation registration first.")
+    // Validate addresses
+    if (!web3.utils.isAddress(address_of_charity)) {
+      App.showError("Invalid charity address. Please enter a valid Ethereum address.")
       return
     }
     
-    try {
-      var address_of_charity = $('#add_of_charity').val()
-      var address_of_organisation = $('#add_of_org').val()
-      var amountToSend = $('#amount').val()
-      
-      if (!address_of_charity || !address_of_organisation || !amountToSend) {
-        App.showError("Please fill in all transaction details.")
+    if (!web3.utils.isAddress(address_of_organisation)) {
+      App.showError("Invalid organisation address. Please enter a valid Ethereum address.")
+      return
+    }
+    
+    // Skip address verification in mock mode
+    if (!App.mockMode) {
+      // Verify if addresses exist in the system
+      const isValidCharity = await App.verifyCharityAddress(address_of_charity)
+      if (!isValidCharity) {
+        App.showError("The charity address does not exist in the system. Please enter a registered charity address.")
         return
       }
       
-      // Validate addresses
-      if (!web3.utils.isAddress(address_of_charity)) {
-        App.showError("Invalid charity address. Please enter a valid Ethereum address.")
+      const isValidOrg = await App.verifyOrganisationAddress(address_of_organisation)
+      if (!isValidOrg) {
+        App.showError("The organisation address does not exist in the system. Please enter a registered organisation address.")
         return
       }
-      
-      if (!web3.utils.isAddress(address_of_organisation)) {
-        App.showError("Invalid organisation address. Please enter a valid Ethereum address.")
-        return
-      }
-      
-      // Skip address verification in mock mode
-      if (!App.mockMode) {
-        // Verify if addresses exist in the system
-        const isValidCharity = await App.verifyCharityAddress(address_of_charity)
-        if (!isValidCharity) {
-          App.showError("The charity address does not exist in the system. Please enter a registered charity address.")
-          return
-        }
-        
-        const isValidOrg = await App.verifyOrganisationAddress(address_of_organisation)
-        if (!isValidOrg) {
-          App.showError("The organisation address does not exist in the system. Please enter a registered organisation address.")
-          return
-        }
-      }
-      
-      App.confirmAction(
-        "Confirm Transaction Details", 
-        `Please confirm the following transaction details:\n\nCharity Address: ${address_of_charity}\nOrganisation Address: ${address_of_organisation}\nAmount: ${amountToSend} ETH`,
-        async function() {
-          try {
-            // Show loading indicator
-            App.setLoading(true, "Processing transaction...")
-            
-            // Update blockchain section with transaction details immediately
-            $('.blockchain-details .content25').text(address_of_organisation)
-            $('.blockchain-details .content26').text(address_of_charity)
-            $('.blockchain-details .content27').text(amountToSend)
-            $('.blockchain-details .content28').text('Processing...')
-            
-            // Record the transaction in the contract if not in mock mode
-            if (!App.mockMode) {
-              try {
-                await App.charity.createTransaction(
-                  address_of_charity, 
-                  address_of_organisation, 
-                  amountToSend,
-                  { 
-                    from: App.account,
-                    gas: 3000000 // Set a higher gas limit
-                  }
-                )
-              } catch (error) {
-                console.error("Error recording transaction in contract:", error)
-                // Continue anyway since we're going to use MetaMask
-              }
-            } else {
-              // In mock mode, record the transaction in our mock storage
-              await App.charity.createTransaction(address_of_charity, address_of_organisation, amountToSend)
-            }
-            
-            // Close loading modal before opening MetaMask
-            App.setLoading(false)
-            
-            // Convert amount for the transaction
-            let weiAmount;
+    }
+    
+    App.confirmAction(
+      "Confirm Transaction Details", 
+      `Please confirm the following transaction details:\n\nCharity Address: ${address_of_charity}\nOrganisation Address: ${address_of_organisation}\nAmount: ${amountToSend} ETH`,
+      async function() {
+        try {
+          // Show loading indicator
+          App.setLoading(true, "Processing transaction...")
+          
+          // Update blockchain section with transaction details immediately
+          $('.blockchain-details .content25').text(address_of_organisation)
+          $('.blockchain-details .content26').text(address_of_charity)
+          $('.blockchain-details .content27').text(amountToSend)
+          $('.blockchain-details .content28').text('Processing...')
+          
+          // Record the transaction in the contract if not in mock mode
+          if (!App.mockMode) {
             try {
-              // Check if the amount is already in Wei (large number)
-              if (amountToSend.length > 10) {
-                weiAmount = amountToSend;
-              } else {
-                // Convert from ETH to Wei
-                weiAmount = web3.utils.toWei(amountToSend.toString(), 'ether');
-              }
-            } catch (e) {
-              // If conversion fails, use the original amount
-              console.error("Error converting amount:", e);
-              weiAmount = amountToSend;
-            }
-            
-            console.log("Sending transaction with amount:", weiAmount);
-            
-            // Show a message to the user
-            App.showInfo("Please confirm the transaction in MetaMask when it opens...");
-            
-            // Always use MetaMask for the transaction, even in mock mode
-            try {
-              // Use the direct web3.eth.sendTransaction method which will trigger MetaMask
-              web3.eth.sendTransaction({
-                from: address_of_organisation,
-                to: address_of_charity,
-                value: weiAmount,
-                gas: 3000000
-              })
-              .on('transactionHash', function(hash) {
-                console.log("Transaction hash:", hash);
-                
-                // Store the transaction hash
-                App.transactionHash = hash;
-                
-                // Update the blockchain section with the hash
-                if (App.mockMode) {
-                  $('.blockchain-details .content28').html(`<span class="text-warning">${hash}</span> (Demo)`);
-                } else {
-                  $('.blockchain-details .content28').html(`<a href="https://etherscan.io/tx/${hash}" target="_blank">${hash}</a>`);
+              await App.charity.createTransaction(
+                address_of_charity, 
+                address_of_organisation, 
+                amountToSend,
+                { 
+                  from: App.account,
+                  gas: 3000000 // Set a higher gas limit
                 }
-                
-                App.transactionCompleted = true;
-                App.updateWorkflowUI();
-                App.showSuccess("Transaction successful! Hash: " + hash + "\n\nYou can now proceed to mine a block.");
-              })
+              )
+            } catch (error) {
+              console.error("Error recording transaction in contract:", error)
+              // Continue anyway since we're going to use MetaMask
+            }
+          } else {
+            // In mock mode, record the transaction in our mock storage
+            await App.charity.createTransaction(address_of_charity, address_of_organisation, amountToSend)
+          }
+          
+          // Close loading modal before opening MetaMask
+          App.setLoading(false)
+          
+          // Convert amount for the transaction
+          let weiAmount;
+          try {
+            // Check if the amount is a small number (likely ETH)
+            if (parseFloat(amountToSend) < 1000) {
+              // Convert from ETH to Wei
+              weiAmount = web3.utils.toWei(amountToSend.toString(), 'ether');
+              console.log("Converted small amount to Wei:", weiAmount);
+            } else {
+              // Assume it's already in a large denomination
+              weiAmount = amountToSend;
+              console.log("Using large amount as is:", weiAmount);
+            }
+          } catch (e) {
+            // If conversion fails, use the original amount
+            console.error("Error converting amount:", e);
+            weiAmount = amountToSend;
+          }
+          
+          console.log("Sending transaction with amount:", weiAmount);
+          
+          // Show a message to the user
+          App.showInfo("Please confirm the transaction in MetaMask when it opens...");
+          
+          // Always use MetaMask for the transaction, even in mock mode
+          try {
+            // Use the direct web3.eth.sendTransaction method which will trigger MetaMask
+            web3.eth.sendTransaction({
+              from: address_of_organisation,
+              to: address_of_charity,
+              value: weiAmount,
+              gas: 3000000
+            })
+            .on('transactionHash', function(hash) {
+              console.log("Transaction hash:", hash);
+              
+              // Store the transaction hash
+              App.transactionHash = hash;
+              
+              // Update the blockchain section with the hash
+              if (App.mockMode) {
+                $('.blockchain-details .content28').html(`<span class="text-warning">${hash}</span> (Demo)`);
+              } else {
+                $('.blockchain-details .content28').html(`<a href="https://etherscan.io/tx/${hash}" target="_blank">${hash}</a>`);
+              }
+              
+              App.transactionCompleted = true;
+              App.updateWorkflowUI();
+              App.showSuccess("Transaction successful! Hash: " + hash + "\n\nYou can now proceed to mine a block.");
+            })
+            // ... rest of the function remains the same
+ 
               .on('receipt', function(receipt) {
                 console.log("Transaction receipt:", receipt);
               })
